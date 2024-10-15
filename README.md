@@ -39,7 +39,7 @@ There are 2 main advantages that SmartGC has over a dedicated GC Engine
 	
 First libclang dll needs to be installed
 (For linux systems)
-1. ` sudo apt install libclang-dev `
+1. ` sudo apt install libclang-14-dev `
 
 (As of 22/04/2024 this should install version 14 of the libclang dll required to run it)
 

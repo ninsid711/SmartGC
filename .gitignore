@@ -1,4 +1,6 @@
 OutCode
 UserCode
 libclang/
+venv/
+__pycache__/
 
