@@ -38,18 +38,26 @@ There are 2 main advantages that SmartGC has over a dedicated GC Engine
 (assuming that the git repo has been pulled)
 	
 First libclang dll needs to be installed
-(For linux systems)
-1. ` sudo apt install libclang-14-dev `
 
-(As of 22/04/2024 this should install version 14 of the libclang dll required to run it)
+(FOR LINUX BASED SYSTEMS ONLY)
 
-2. ` pip install clang==14 `
+1. ` python -m venv venv && source venv/bin/activate `
+    
+    This will create a virtual environment.
 
-This will install clang version 14 for python.
+
+2. ` sudo apt install libclang-14-dev `
+
+    (As of 15/10/2024 this should install version 14 of the libclang dll required to run it)
+
+3. ` pip install clang==14 `
+
+    This will install clang version 14 for python.
+
 
 Now that the setup is ready, you can run the following command to use SmartGC
 
-3. ` python3 ParseInject.py UserCode.c OutCode.c references.json `
+` python3 ParseInject.py UserCode.c OutCode.c references.json `
 
 This will (if it does not already exist), create a OutCode.c that has been injected with memory free statements
 and can be compiled and used at will. 
