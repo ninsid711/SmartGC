@@ -41,7 +41,7 @@ First libclang dll needs to be installed
 
 (FOR LINUX BASED SYSTEMS ONLY)
 
-1. ` python -m venv venv && source venv/bin/activate `
+1. ` python3 -m venv venv && source venv/bin/activate `
     
     This will create a virtual environment.
 
