@@ -4,7 +4,7 @@ A smart garbage collector for C.
 SmartGC is not exactly a garbage collector, the one main difference is that it does not 
 run during the runtime of the code.
 
-SmartGC pre-emptively decides when and where to clear up the memory in a c program.
+SmartGC pre-emptively(statically) decides when and where to clear up the memory in a c program.
 
 There are 2 main advantages that SmartGC has over a dedicated GC Engine
 
@@ -31,8 +31,8 @@ There are 2 main advantages that SmartGC has over a dedicated GC Engine
 3. Storing the line no might not be safe as multiple lines of code can be written in a single line, hence we 
    we need to determine at which exact location the memory was freed and then clear it.
 4. Edge cases have not yet been tested, references used inside loops have been handled, but there are other 
-   cases, such as static, extern, register variables that may be dynamically allocated, multiple file structures
-   that share memory, and such cases have to be handled in the future.
+   cases, such as multiple file structures
+   that share memory have to be handled in the future.
 
 ## How to use SmartGC? 
 (assuming that the git repo has been pulled)
@@ -62,7 +62,30 @@ Now that the setup is ready, you can run the following command to use SmartGC
 This will (if it does not already exist), create a OutCode.c that has been injected with memory free statements
 and can be compiled and used at will. 
 
-	 
+## A few things to take care of:
 
+In your c program there are a few things that you need to take care of:
 
+Make sure the allocation statements are in this exact format:
+  `int *x = (int *)malloc(sizeof(int));`
+
+Ofcourse the types and the variable names can be different but make sure the whitespaces match 
+the above format.
+
+Another very important thing to make sure is that when you allocate memory, the allocated space 
+should be used, as in if you have 
+
+```
+int *x = (int *)malloc(sizeof(int));
+*x = 10;
+```
+
+make sure you have used the variable somewhere else in the code as well, (if you donot, the parser
+will not accept the allocation and reject it since its not been used and hence it is free by default).
+
+If in case you close your workspace (terminal/vscode/etc) you will need to run
+
+`source venv/bin/activate`
+
+before you run the python commands.
 
