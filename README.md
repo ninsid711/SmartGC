@@ -75,7 +75,7 @@ the above format.
 Another very important thing to make sure is that when you allocate memory, the allocated space 
 should be used, as in if you have 
 
-```
+```c
 int *x = (int *)malloc(sizeof(int));
 *x = 10; // have something like this
 ```
