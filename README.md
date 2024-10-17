@@ -77,11 +77,11 @@ should be used, as in if you have
 
 ```
 int *x = (int *)malloc(sizeof(int));
-*x = 10;
+*x = 10; // have something like this
 ```
 
-make sure you have used the variable somewhere else in the code as well, (if you donot, the parser
-will not accept the allocation and reject it since its not been used and hence it is free by default).
+make sure you have used the variable somewhere else in the code after allocation,
+(if you donot, the parser will not accept the allocation and reject it since its not been used and hence it is free by default).
 
 If in case you close your workspace (terminal/vscode/etc) you will need to run
 
