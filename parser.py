@@ -3,9 +3,10 @@ from clang.cindex import CursorKind, Index
 
 deallocations = []
 references = {}
+conditional_allocs = {}
 
 
-def traverse_ast(node, start_line=None,end_line = None):
+def traverse_ast(node, start_line=None, end_line=None, inside_conditional=False):
     if start_line is None:
         start_line = node.location.line
 
@@ -13,15 +14,27 @@ def traverse_ast(node, start_line=None,end_line = None):
         start_line = node.location.line
         end_line = node.extent.end.line
 
+    if node.kind == CursorKind.IF_STMT:
+        inside_conditional = True
+        start_line = node.location.line
+        end_line = node.extent.end.line
+
     if node.kind == CursorKind.DECL_REF_EXPR:
         if node.referenced and node.referenced.kind == CursorKind.VAR_DECL:
             var_name = node.spelling
-            references[var_name] = node.location.line
+            if not inside_conditional:
+                references[var_name] = node.location.line
+            else:
+                conditional_allocs[var_name] = node.location.line
 
     for child in node.get_children():
-        traverse_ast(child, start_line, end_line)
+        traverse_ast(child, start_line, end_line, inside_conditional)
 
-    if node.kind == CursorKind.FOR_STMT or node.kind == CursorKind.WHILE_STMT:
+    if (
+        node.kind == CursorKind.FOR_STMT
+        or node.kind == CursorKind.WHILE_STMT
+        or node.kind == CursorKind.IF_STMT
+    ):
         for iterator in references.keys():
             line_number = references[iterator]
             if start_line <= line_number <= end_line:
@@ -29,19 +42,19 @@ def traverse_ast(node, start_line=None,end_line = None):
 
 
 def check_alloc_term(filename, line_number, var_name):
-    with open(filename, 'r') as f:
+    with open(filename, "r") as f:
         lines = f.readlines()
         for i, line in enumerate(lines):
-            if ("alloc" in line): 
-                if (("*" + var_name) in line):
+            if "alloc" in line:
+                if ("*" + var_name) in line:
                     return True
     return False
 
 
 def main(input_file, json_file):
     index = Index.create()
-    tu = index.parse(input_file, args=['-std=c11'])
-    print('Translation unit:', tu.spelling)
+    tu = index.parse(input_file, args=["-std=c11"])
+    print("Translation unit:", tu.spelling)
 
     for node in tu.cursor.get_children():
         if node.kind == CursorKind.FUNCTION_DECL:
@@ -51,15 +64,14 @@ def main(input_file, json_file):
         references[iterator] = int(references[iterator])
         line_number = references[iterator]
         if check_alloc_term(input_file, line_number, iterator):
-            deallocations.append({"line_number": line_number, "variable_name": iterator})
+            deallocations.append(
+                {"line_number": line_number, "variable_name": iterator}
+            )
 
-    output = {
-        "deallocations": deallocations
-    }
-    #print(deallocations)
+    output = {"deallocations": deallocations}
 
     if deallocations:
-        with open(json_file, 'w') as f:
+        with open(json_file, "w") as f:
             json.dump(output, f, indent=4)
         print("Data written to references.json")
     else:
